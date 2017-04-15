@@ -54,7 +54,20 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	err = toml.NewEncoder(&manifestToml).Encode(manifest)
+
+	var dependencies []map[string]interface{}
+	for name, data := range manifest["dependencies"].(map[string]interface{}) {
+		dependencies = append(dependencies, map[string]interface{}{
+			"branch": data.(map[string]interface{})["branch"],
+			"name":   name,
+		})
+	}
+
+	newManifest := map[string]interface{}{
+		"dependencies": dependencies,
+	}
+
+	err = toml.NewEncoder(&manifestToml).Encode(newManifest)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
